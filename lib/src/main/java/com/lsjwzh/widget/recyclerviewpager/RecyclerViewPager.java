@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +50,8 @@ public class RecyclerViewPager extends RecyclerView {
     private boolean mHasCalledOnPageChanged = true;
     private boolean reverseLayout = false;
     private float mLastY;
+
+    private float mSpeedPerPixel = 50f;
 
     public RecyclerViewPager(Context context) {
         this(context, null);
@@ -95,6 +98,14 @@ public class RecyclerViewPager extends RecyclerView {
 
     public boolean isSinglePageFling() {
         return mSinglePageFling;
+    }
+
+    public void setSpeedPerPixel(float speedPerPixel) {
+        mSpeedPerPixel = speedPerPixel;
+    }
+
+    public float getSpeedPerPixel() {
+        return mSpeedPerPixel;
     }
 
     @Override
@@ -221,6 +232,12 @@ public class RecyclerViewPager extends RecyclerView {
                             if (time > 0) {
                                 action.update(-dx, -dy, time, mDecelerateInterpolator);
                             }
+                        }
+
+                        @Override
+                        protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                            // Slow down the speed after RVP is idled.
+                            return mSpeedPerPixel / displayMetrics.densityDpi;
                         }
                     };
             linearSmoothScroller.setTargetPosition(position);
@@ -454,17 +471,7 @@ public class RecyclerViewPager extends RecyclerView {
                 int targetPosition = getLayoutManager().canScrollHorizontally() ? ViewUtils.getCenterXChildPosition(this) :
                         ViewUtils.getCenterYChildPosition(this);
                 if (mCurView != null) {
-                    targetPosition = getChildAdapterPosition(mCurView);
                     if (getLayoutManager().canScrollHorizontally()) {
-                        int spanX = mCurView.getLeft() - mFisrtLeftWhenDragging;
-                        // if user is tending to cancel paging action, don't perform position changing
-                        if (spanX > mCurView.getWidth() * mTriggerOffset && mCurView.getLeft() >= mMaxLeftWhenDragging) {
-                            if (!reverseLayout) targetPosition--;
-                            else targetPosition++;
-                        } else if (spanX < mCurView.getWidth() * -mTriggerOffset && mCurView.getLeft() <= mMinLeftWhenDragging) {
-                            if (!reverseLayout) targetPosition++;
-                            else targetPosition--;
-                        }
                     } else {
                         int spanY = mCurView.getTop() - mFirstTopWhenDragging;
                         if (spanY > mCurView.getHeight() * mTriggerOffset && mCurView.getTop() >= mMaxTopWhenDragging) {
