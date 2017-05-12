@@ -1,9 +1,5 @@
 package com.lsjwzh.widget.recyclerviewpager;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -16,6 +12,10 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Implementation of {@link android.support.v4.view.PagerAdapter} that
